@@ -56,3 +56,46 @@ def test_smoke_checkout_non_empty_cart():
     order = c.checkout()
     assert order == [101]
     assert c.items == []
+
+    # ==============================================================================
+# PHASE 4: SLOW TESTS
+# ==============================================================================
+
+@pytest.mark.slow
+def test_slow_bulk_product_import():
+    """Author: Preston Shah. Slow test: Imports 20,000 products into the catalog.
+    
+    Why slow: Iterates through 20,000 product tuples calling Catalog.add_product,
+    executing thousands of dict insertions and timing overhead.
+    """
+    cat = Catalog()
+    c = Cart(cat)
+    large_catalog_data = [(i, f"Book {i}", 10 + (i % 50)) for i in range(20000)]
+    imported_count = c.import_products(large_catalog_data)
+    
+    # Check that products were actually stored in the catalog
+    assert 19999 in cat.products
+    assert cat.products[19999]["title"] == "Book 19999"
+
+
+@pytest.mark.slow
+def test_slow_large_cart_repeated_total_calculation():
+    """Author: Preston Shah. Slow test: Calculates total on a cart with 10,000 items repeatedly.
+    
+    Why slow: Builds a 10,000 item cart and computes total multiple times across thousands 
+    of list iterations and dictionary lookups.
+    """
+    cat = Catalog()
+    for i in range(100):
+        cat.add_product(i, f"Title {i}", 5)
+    
+    c = Cart(cat)
+    for _ in range(100):
+        for i in range(100):
+            c.add(i)
+            
+    assert len(c.items) == 10000
+    
+    # Calculate total 5 times to execute dense iteration loops
+    for _ in range(5):
+        _ = c.total()
