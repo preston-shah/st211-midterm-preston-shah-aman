@@ -205,3 +205,23 @@ def test_regression_history_returns_copy_preventing_external_mutation():
     hist.clear()
     
     assert c.history() == [[1]]
+    # ==============================================================================
+# BONUS TEST (+10 MARKS)
+# ==============================================================================
+
+@pytest.mark.regression
+@pytest.mark.slow
+def test_bonus_large_cart_total_regression_and_slow():
+    """Author: Preston Shah.
+    
+    Why Regression: Fails on original code because total() skips the 100,000th item.
+    Why Slow: Builds a 100,000 item cart and computes total across massive list iterations.
+    Where in CI: Belongs in nightlies / scheduled workflow runs only, due to execution time.
+    """
+    cat = Catalog()
+    cat.add_product(1, "Book A", 10)
+    c = Cart(cat)
+    for _ in range(100000):
+        c.add(1)
+        
+    assert c.total() == 1000000
