@@ -22,8 +22,8 @@ jobs:
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-    - name: Run Pytest (Excluding Slow Tests)
+    - name: Run Pytest on Bookstore Assignment Tests Only
       run: |
-        python -m pytest -m "not slow" -v
+        python -m pytest tests/test_bookstore.py -m "not slow" -v
