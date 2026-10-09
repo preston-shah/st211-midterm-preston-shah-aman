@@ -185,3 +185,23 @@ def test_regression_search_is_case_insensitive():
     results = cat.search("python")
     
     assert results == [1]
+
+
+@pytest.mark.regression
+def test_regression_history_returns_copy_preventing_external_mutation():
+    """Author: Preston Shah.
+    
+    Target: Cart.history() in bookstore_app/cart.py.
+    Wrong behavior: Returns live internal self.orders list, allowing external callers to mutate history.
+    Correct behavior: Returns a copy of orders so external mutation does not affect internal history.
+    """
+    cat = Catalog()
+    cat.add_product(1, "Book A", 10)
+    c = Cart(cat)
+    c.add(1)
+    c.checkout()
+    
+    hist = c.history()
+    hist.clear()
+    
+    assert c.history() == [[1]]
