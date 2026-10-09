@@ -169,3 +169,19 @@ def test_regression_login_supports_punctuated_passwords():
     u = Users()
     u.register("preston", "secret!123")
     assert u.login("preston", "secret!123") is True
+
+
+@pytest.mark.regression
+def test_regression_search_is_case_insensitive():
+    """Author: Preston Shah.
+    
+    Target: Catalog.search() in bookstore_app/catalog.py.
+    Wrong behavior: Performs case-sensitive search, failing to find titles with different casing.
+    Correct behavior: Performs case-insensitive matching for keyword in product titles.
+    """
+    cat = Catalog()
+    cat.add_product(1, "Python Testing Guide", 30)
+    
+    results = cat.search("python")
+    
+    assert results == [1]
