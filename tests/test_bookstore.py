@@ -57,7 +57,8 @@ def test_smoke_checkout_non_empty_cart():
     assert order == [101]
     assert c.items == []
 
-    # ==============================================================================
+
+# ==============================================================================
 # PHASE 4: SLOW TESTS
 # ==============================================================================
 
@@ -73,7 +74,6 @@ def test_slow_bulk_product_import():
     large_catalog_data = [(i, f"Book {i}", 10 + (i % 50)) for i in range(20000)]
     imported_count = c.import_products(large_catalog_data)
     
-    # Check that products were actually stored in the catalog
     assert 19999 in cat.products
     assert cat.products[19999]["title"] == "Book 19999"
 
@@ -96,11 +96,11 @@ def test_slow_large_cart_repeated_total_calculation():
             
     assert len(c.items) == 10000
     
-    # Calculate total 5 times to execute dense iteration loops
     for _ in range(5):
         _ = c.total()
 
-        # ==============================================================================
+
+# ==============================================================================
 # PHASE 5: REGRESSION TESTS
 # ==============================================================================
 
@@ -122,7 +122,8 @@ def test_regression_cart_total_includes_all_items():
     
     assert c.total() == 30
 
-    @pytest.mark.regression
+
+@pytest.mark.regression
 def test_regression_import_products_returns_exact_count():
     """Author: Preston Shah.
     
@@ -137,3 +138,34 @@ def test_regression_import_products_returns_exact_count():
     imported_count = c.import_products(products)
     
     assert imported_count == 2
+
+
+@pytest.mark.regression
+def test_regression_checkout_empty_cart_returns_none():
+    """Author: Preston Shah.
+    
+    Target: Cart.checkout() in bookstore_app/cart.py.
+    Wrong behavior: Returns [] and appends an empty order to self.orders when cart is empty.
+    Correct behavior: Returns None and does not modify order history if cart is empty.
+    """
+    cat = Catalog()
+    c = Cart(cat)
+    
+    result = c.checkout()
+    
+    assert result is None
+    assert c.history() == []
+
+
+@pytest.mark.regression
+def test_regression_login_supports_punctuated_passwords():
+    """Author: Preston Shah.
+    
+    Target: Users.login() in bookstore_app/users.py.
+    Wrong behavior: Strips non-alphanumeric characters from input password, causing
+    exact-match logins with punctuated passwords to fail.
+    Correct behavior: Preserves exact password string and returns True for exact match.
+    """
+    u = Users()
+    u.register("preston", "secret!123")
+    assert u.login("preston", "secret!123") is True
