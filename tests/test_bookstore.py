@@ -99,3 +99,25 @@ def test_slow_large_cart_repeated_total_calculation():
     # Calculate total 5 times to execute dense iteration loops
     for _ in range(5):
         _ = c.total()
+
+        # ==============================================================================
+# PHASE 5: REGRESSION TESTS
+# ==============================================================================
+
+@pytest.mark.regression
+def test_regression_cart_total_includes_all_items():
+    """Author: Preston Shah.
+    
+    Target: Cart.total() in bookstore_app/cart.py.
+    Wrong behavior: Uses range(len(self.items) - 1), omitting the final item's price.
+    Correct behavior: Sums the prices of ALL items in the cart.
+    """
+    cat = Catalog()
+    cat.add_product(1, "Book A", 10)
+    cat.add_product(2, "Book B", 20)
+    
+    c = Cart(cat)
+    c.add(1)
+    c.add(2)
+    
+    assert c.total() == 30
