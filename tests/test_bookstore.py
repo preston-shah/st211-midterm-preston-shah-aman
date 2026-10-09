@@ -121,3 +121,19 @@ def test_regression_cart_total_includes_all_items():
     c.add(2)
     
     assert c.total() == 30
+
+    @pytest.mark.regression
+def test_regression_import_products_returns_exact_count():
+    """Author: Preston Shah.
+    
+    Target: Cart.import_products() in bookstore_app/cart.py.
+    Wrong behavior: Returns count + 1, overcounting imported items by 1.
+    Correct behavior: Returns the exact number of items successfully imported.
+    """
+    cat = Catalog()
+    c = Cart(cat)
+    products = [(1, "Book A", 10), (2, "Book B", 15)]
+    
+    imported_count = c.import_products(products)
+    
+    assert imported_count == 2
